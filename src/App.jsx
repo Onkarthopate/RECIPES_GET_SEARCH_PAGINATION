@@ -4,14 +4,18 @@ import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 // import './App.css'
 import Todo from './Components/Todo'
+import TodoExample from './Components/TodoExample'
 
 function App() {
 
   return (
     <>
 
-    <Todo/>
- 
+    {/* <Todo/> */}
+    
+    <TodoExample/>
+
+
     </>
   )
 }

@@ -4,6 +4,7 @@ const Todo = () => {
     const [data, setData] = useState([]);
 
     const [search , setSearch] = useState("");
+    const [debounceSearch , setDebounceSearch] = useState("");
 
     const fetchData = async () => {
         try {
