@@ -6,42 +6,58 @@ const TodoExample = () => {
     const [search, setSearch] = useState("");
     const [debounceSearch, setDebounceSearch] = useState("");
 
+    const [page, setPage] = useState(1);
+
+    const limit = 3;
+
+    const lastIndex = page * limit;
+    const firstIndex = lastIndex - limit;
+
+
+
+
     useEffect(() => {
 
         const controller = new AbortController();
 
         const fetchData = async () => {
             try {
-                const res = await fetch(`https://dummyjson.com/recipes?search=${search}` , {
-                    signal : controller.signal,
+                const res = await fetch(`https://dummyjson.com/recipes?search=${search}`, {
+                    signal: controller.signal,
                 });
                 const result = await res.json();
                 setData(result.recipes || [])
 
             } catch (error) {
-                console.log(error);
+                if (error.name !== "AbortError") { console.log(error); }
             }
         }
 
         fetchData();
 
-        return ()=> controller.abort();
+        return () => controller.abort();
 
-    },[search])
+    }, [search])
 
-    useEffect(()=>{
+    useEffect(() => { setPage(1); }, [debounceSearch]);
+
+    useEffect(() => {
         const timer = setTimeout(() => {
             setDebounceSearch(search);
         }, 900);
 
-        return ()=> clearTimeout(timer);
-    },[search])
+        return () => clearTimeout(timer);
+    }, [search])
 
     const searchData = data.filter((i) => {
         const name = i.name.toLowerCase().trim();
 
         return name.includes(debounceSearch.toLowerCase());
     });
+
+    const totalPage = Math.ceil(searchData.length / limit);
+
+    const currentData = searchData.slice(firstIndex, lastIndex);
 
     return (
 
@@ -53,7 +69,7 @@ const TodoExample = () => {
             <div style={{ display: "grid", gap: "15px", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", alignItems: "stretch" }}>
 
                 {
-                    searchData.length > 0 ? searchData.map((n) => {
+                    currentData.length > 0 ? currentData.map((n) => {
                         console.log(n);
 
                         const ingredients = n.ingredients.join(",");
@@ -72,6 +88,17 @@ const TodoExample = () => {
                     }) : <p style={{ margin: "0 auto" }}>No Record Found</p>
                 }
             </div>
+
+            {
+                totalPage > 0 && (
+                    <div style={{ display: "flex" }}>
+                        <button disabled={page === 1} onClick={() => setPage(page - 1)}>previous</button>
+                        <span>page of {page} outOf {totalPage} </span>
+                        <button disabled={page === totalPage} onClick={() => setPage(page + 1)}>next</button>
+                    </div>
+                )
+            }
+
 
         </>
 
